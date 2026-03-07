@@ -30,6 +30,27 @@ async function uploadToStorage(audioStream) {
 }
 
 // Download a Twilio media URL (requires Basic Auth) and transcribe via ElevenLabs STT
+function formatTranscript(transcript) {
+    if (transcript.utterances && transcript.utterances.length > 0) {
+        const speakerMap = {};
+        let speakerCount = 1;
+
+        const lines = transcript.utterances.map(u => {
+            if (!speakerMap[u.speaker]) {
+                speakerMap[u.speaker] = `Speaker ${speakerCount++}`;
+            }
+            return `${speakerMap[u.speaker]}: ${u.text}`;
+        });
+
+        const uniqueSpeakers = Object.keys(speakerMap).length;
+        if (uniqueSpeakers > 1) {
+            return lines.join('\n');
+        }
+    }
+    // Fallback to plain text (single speaker or no utterances)
+    return transcript.text;
+}
+
 async function transcribeVoiceNote(mediaUrl) {
     // 1. Download the audio from Twilio (requires auth because media is private)
     const response = await axios.get(mediaUrl, {
@@ -46,14 +67,18 @@ async function transcribeVoiceNote(mediaUrl) {
     const tmpFile = path.join(tmpDir, `incoming_${Date.now()}.ogg`);
     fs.writeFileSync(tmpFile, response.data);
 
-    // 3. Transcribe via ElevenLabs STT
+    // 3. Transcribe via ElevenLabs Scribe v2
     try {
         const transcript = await elevenlabs.speechToText.convert({
             file: fs.createReadStream(tmpFile),
-            model_id: 'scribe_v1'
+            modelId: 'scribe_v2',
+            diarize: true,           // identify who is speaking
+            tagAudioEvents: true,    // detect laughter, pauses, background noise
+            keyTerms: ['SIN', 'OHIP', 'IRCC', 'Express Entry', 'NOC', 'PR', 'study permit', 'work permit', 'T4', 'GST', 'CRA']
+            // languageCode: undefined — Scribe v2 auto-detects language
         });
-        // Return both the text and the detected language code (e.g. "ar", "ur", "fr")
-        return { text: transcript.text, language: transcript.language_code || 'en' };
+        // Return both the formatted transcript and the detected language code
+        return { text: formatTranscript(transcript), language: transcript.language_code || 'en' };
     } finally {
         // Cleanup temp file
         fs.unlink(tmpFile, () => { });
