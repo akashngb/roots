@@ -6,6 +6,7 @@ const { chat, saveUserProfile, loadUserData } = require('../services/backboard')
 const sessions = {};
 
 const ONBOARDING_QUESTIONS = [
+  "What is your full name?",
   "Which country are you originally from?",
   "What language do you prefer to communicate in? (e.g. English, French, Spanish, Hindi, Urdu, Tagalog, Ukrainian)",
   "Which province are you settling in? (e.g. Ontario, British Columbia, Alberta, Quebec)",
@@ -47,7 +48,7 @@ async function handle(userId, message) {
       profile: {},
       answers: []
     };
-    return "Welcome to Roots 🌱\n\nI help newcomers to Canada figure out exactly what to do — and in what order. Let's start with a few quick questions.\n\nFirst: where did you arrive from, and when did you land in Canada?";
+    return "Welcome to Roots 🌱\n\nI help newcomers to Canada navigate their settlement journey — from documents and healthcare to career and community.\n\nLet's start with a few quick questions so I can build your personal roadmap.\n\nFirst: What is your full name?";
   }
 
   const session = sessions[userId];
@@ -92,16 +93,17 @@ async function handle(userId, message) {
 
     // Persist full profile to disk so it survives restarts
     const profileForDisk = {
-      country: session.answers[0],
-      language: session.answers[1],
-      province: session.answers[2],
-      city: session.answers[3],
-      arrivalDate: session.answers[4],
-      status: session.answers[5],
-      profession: session.answers[6],
-      education: session.answers[7],
-      family: session.answers[8],
-      concern: session.answers[9]
+      name: session.answers[0],
+      country: session.answers[1],
+      language: session.answers[2],
+      province: session.answers[3],
+      city: session.answers[4],
+      arrivalDate: session.answers[5],
+      status: session.answers[6],
+      profession: session.answers[7],
+      education: session.answers[8],
+      family: session.answers[9],
+      concern: session.answers[10]
     };
     saveUserProfile(userId, profileForDisk, 'active');
 
