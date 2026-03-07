@@ -1,13 +1,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Link } from 'react-router-dom';
 
 export const LoginPage = () => {
     const { loginWithRedirect, isAuthenticated } = useAuth0();
 
     if (isAuthenticated) {
-        return <Navigate to="/dashboard" replace />;
+        return <Navigate to="/phone-link" replace />;
     }
 
     return (
@@ -51,13 +50,6 @@ export const LoginPage = () => {
                     Continue with Apple
                 </button>
 
-                {/* Bottom text */}
-                <p className="text-xs text-charcoal/30 text-center mt-10">
-                    New here?{' '}
-                    <Link to="/onboarding" className="text-forest underline underline-offset-4">
-                        Complete your onboarding first
-                    </Link>
-                </p>
             </div>
         </div>
     );
