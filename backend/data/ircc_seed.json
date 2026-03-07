@@ -1,0 +1,23 @@
+{
+  "profiles": [
+    { "type": "PR - Express Entry", "office": "Ottawa", "submittedMonthsAgo": 6, "outcome": "approved", "totalMonths": 6 },
+    { "type": "PR - Express Entry", "office": "Ottawa", "submittedMonthsAgo": 8, "outcome": "approved", "totalMonths": 7 },
+    { "type": "PR - Express Entry", "office": "Ottawa", "submittedMonthsAgo": 14, "outcome": "pending", "totalMonths": null },
+    { "type": "PR - Express Entry", "office": "Ottawa", "submittedMonthsAgo": 16, "outcome": "approved", "totalMonths": 16 },
+    { "type": "PR - Express Entry", "office": "Ottawa", "submittedMonthsAgo": 18, "outcome": "approved", "totalMonths": 17 },
+    { "type": "PR - Express Entry", "office": "Mississauga", "submittedMonthsAgo": 10, "outcome": "approved", "totalMonths": 9 },
+    { "type": "PR - Express Entry", "office": "Mississauga", "submittedMonthsAgo": 13, "outcome": "approved", "totalMonths": 12 },
+    { "type": "PR - Express Entry", "office": "Mississauga", "submittedMonthsAgo": 20, "outcome": "approved", "totalMonths": 19 },
+    { "type": "Work Permit", "office": "Ottawa", "submittedMonthsAgo": 3, "outcome": "approved", "totalMonths": 3 },
+    { "type": "Work Permit", "office": "Ottawa", "submittedMonthsAgo": 5, "outcome": "approved", "totalMonths": 4 },
+    { "type": "Work Permit", "office": "Ottawa", "submittedMonthsAgo": 7, "outcome": "approved", "totalMonths": 6 },
+    { "type": "Work Permit", "office": "Mississauga", "submittedMonthsAgo": 4, "outcome": "approved", "totalMonths": 4 },
+    { "type": "Study Permit", "office": "Ottawa", "submittedMonthsAgo": 2, "outcome": "approved", "totalMonths": 2 },
+    { "type": "Study Permit", "office": "Ottawa", "submittedMonthsAgo": 3, "outcome": "approved", "totalMonths": 3 },
+    { "type": "Study Permit", "office": "Mississauga", "submittedMonthsAgo": 4, "outcome": "approved", "totalMonths": 3 },
+    { "type": "PR - Spousal", "office": "Ottawa", "submittedMonthsAgo": 11, "outcome": "approved", "totalMonths": 10 },
+    { "type": "PR - Spousal", "office": "Ottawa", "submittedMonthsAgo": 14, "outcome": "approved", "totalMonths": 13 },
+    { "type": "PR - Spousal", "office": "Ottawa", "submittedMonthsAgo": 18, "outcome": "pending", "totalMonths": null },
+    { "type": "PR - Spousal", "office": "Mississauga", "submittedMonthsAgo": 16, "outcome": "approved", "totalMonths": 15 }
+  ]
+}
