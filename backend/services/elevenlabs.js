@@ -60,24 +60,52 @@ async function transcribeVoiceNote(mediaUrl) {
     }
 }
 
+// Emotion profiles for ElevenLabs v3 audio tags
+const EMOTION_PROFILES = {
+    urgent: '[serious][calm]',
+    empathetic: '[warmly][softly]',
+    cheerful: '[cheerfully][excited]',
+    neutral: '[calm]',
+    onboarding: '[warmly][gently]',
+};
+
+function detectMessageType(text) {
+    const lower = text.toLowerCase();
+    if (/expires|deadline|urgent|days left|critical/.test(lower)) return 'urgent';
+    if (/hard|worry|alone|difficult|stress|miss/.test(lower)) return 'empathetic';
+    if (/congratulations|completed|approved|great job|well done/.test(lower)) return 'cheerful';
+    if (/welcome to roots|first question|let's start/.test(lower)) return 'onboarding';
+    return 'neutral';
+}
+
+function addEmotionTags(text, messageType) {
+    const tags = EMOTION_PROFILES[messageType] || EMOTION_PROFILES.neutral;
+    return `${tags} ${text}`;
+}
+
 async function sendRootsVoiceNote(userPhoneNumber, geminiResponseText) {
     if (!process.env.ELEVENLABS_API_KEY) {
         console.warn('Skipping ElevenLabs voice note: no API key.');
         return;
     }
 
-    // 1. Convert text to OGG/Opus
+    // 1. Detect tone and prepend emotion tags for v3
+    const messageType = detectMessageType(geminiResponseText);
+    const taggedText = addEmotionTags(geminiResponseText, messageType);
+    console.log(`🎭 Emotion type: ${messageType}`);
+
+    // 2. Convert text to OGG/Opus using eleven_v3 with Creative stability
     const audioStream = await elevenlabs.textToSpeech.convert(
         "JBFqnCBsd6RMkjVDRZzb",
         {
-            text: geminiResponseText,
-            model_id: "eleven_multilingual_v2",
+            text: taggedText,
+            model_id: "eleven_v3",
             output_format: "ogg_44100_128",
-            voice_settings: { stability: 0.4, similarity_boost: 0.8 }
+            voice_settings: { stability: 0.3, similarity_boost: 0.8 }
         }
     );
 
-    // 2. Save locally and get public URL
+    // 3. Save locally and get public URL
     const publicAudioUrl = await uploadToStorage(audioStream);
 
     const fromNumber = process.env.TWILIO_WHATSAPP_FROM.startsWith('whatsapp:')
@@ -88,7 +116,7 @@ async function sendRootsVoiceNote(userPhoneNumber, geminiResponseText) {
         ? userPhoneNumber
         : `whatsapp:${userPhoneNumber}`;
 
-    // 3. Send as voice note via Twilio
+    // 4. Send as voice note via Twilio
     await client.messages.create({
         from: fromNumber,
         to: toNumber,
