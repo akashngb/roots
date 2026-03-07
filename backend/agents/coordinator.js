@@ -1,6 +1,7 @@
 const { generateCriticalPath } = require('../services/gemini');
 const { formatStatusMessage } = require('../services/statusTracker');
 const { formatProxyMessage } = require('../services/proxyMatcher');
+const { chat, saveUserProfile, loadUserData } = require('../services/backboard');
 
 const sessions = {};
 
@@ -12,7 +13,28 @@ const ONBOARDING_QUESTIONS = [
   "What are you most worried about right now?"
 ];
 
+const ROOTS_SYSTEM_PROMPT = `You are Roots 🌱, a warm and knowledgeable AI companion for newcomers to Canada built by 49th. You help immigrants navigate settlement — documents, healthcare, SIN, OHIP, banking, career, and community.
+
+You already know this user's profile from onboarding. Use everything you know about them to give specific, practical advice. Never ask them to repeat information they've already given.
+
+CRITICAL: Always respond in the same language the user writes in. If they write in French, respond in French. If Spanish, respond in Spanish.
+
+Keep responses concise and actionable. Use WhatsApp formatting: *bold* for important terms, line breaks for readability. End with a helpful next step or question.`;
+
 async function handle(userId, message) {
+  // Task 3 — restore session from disk if not in memory
+  if (!sessions[userId]) {
+    const saved = loadUserData(userId);
+    if (saved?.stage === 'active') {
+      sessions[userId] = {
+        stage: 'active',
+        profile: saved.profile || {},
+        answers: [],
+        questionIndex: 5
+      };
+    }
+  }
+
   if (!sessions[userId]) {
     sessions[userId] = {
       stage: 'onboarding',
@@ -63,6 +85,16 @@ async function handle(userId, message) {
       questions: ONBOARDING_QUESTIONS
     };
 
+    // Persist profile + stage to disk so it survives restarts
+    const profileForDisk = {
+      city: session.answers[0],
+      status: session.answers[1],
+      profession: session.answers[2],
+      family: session.answers[3],
+      concern: session.answers[4]
+    };
+    saveUserProfile(userId, profileForDisk, 'active');
+
     try {
       const path = await generateCriticalPath(session.profile);
       const tasks = path.tasks.slice(0, 5);
@@ -75,12 +107,28 @@ async function handle(userId, message) {
       return response;
     } catch (err) {
       console.error('Gemini error:', err.response?.data || err.message);
-      return `Here's your critical path...` // hardcoded fallback
+      return "Here's your critical path — your next steps are: SIN application, bank account, and healthcare registration. Type *STATUS* to check any application timeline.";
     }
   }
 
-  // ACTIVE — general responses
-  return "I'm here to help 🌱\n\nType:\n*STATUS* — check your application timeline\n*PROXY* — hear from people who made your exact move\n\nOr just ask me anything about settling in Canada.";
+  // Task 2 — ACTIVE stage: route through Backboard with profile context
+  if (session.stage === 'active') {
+    const profileContext = session.profile?.answers
+      ? `[User profile: ${session.profile.questions.map((q, i) => `${q}: ${session.profile.answers[i]}`).join(' | ')}]`
+      : '';
+
+    const fullMessage = profileContext
+      ? `${profileContext}\n\nUser says: ${message}`
+      : message;
+
+    try {
+      const response = await chat(userId, fullMessage, ROOTS_SYSTEM_PROMPT);
+      return response;
+    } catch (err) {
+      console.error('Backboard chat error:', err.message);
+      return "I'm having trouble connecting right now. Please try again in a moment 🌱";
+    }
+  }
 }
 
 module.exports = { handle };
