@@ -11,6 +11,7 @@ import { Career } from './pages/Career';
 import { Family } from './pages/Family';
 import { Community } from './pages/Community';
 import { Messages } from './pages/Messages';
+import { Settings } from './pages/Settings';
 import { AIAssistant } from './components/AIAssistant';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -53,6 +54,7 @@ export default function App() {
       <Route path="/dashboard/family" element={<DashboardLayout><Family /></DashboardLayout>} />
       <Route path="/dashboard/community" element={<DashboardLayout><Community /></DashboardLayout>} />
       <Route path="/dashboard/messages" element={<DashboardLayout><Messages /></DashboardLayout>} />
+      <Route path="/dashboard/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
