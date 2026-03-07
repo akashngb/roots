@@ -18,6 +18,14 @@ router.post('/', async (req, res) => {
     if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
       const { sendWhatsAppMessage } = require('../services/twilio');
       await sendWhatsAppMessage(from, response);
+
+      // Try sending a voice note version asynchronously!
+      if (process.env.ELEVENLABS_API_KEY) {
+        const { sendRootsVoiceNote } = require('../services/elevenlabs');
+        sendRootsVoiceNote(from, response).catch(err => {
+          console.error('Failed to send ElevenLabs voice note:', err);
+        });
+      }
     }
   } catch (err) {
     console.error('Handler error:', err);

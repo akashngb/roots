@@ -4,6 +4,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Allow Twilio to fetch generated voice notes publicly
+const path = require('path');
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 const { createAssistant } = require('./services/backboard');
 const { setAssistantId } = require('./agents/coordinator');
 
