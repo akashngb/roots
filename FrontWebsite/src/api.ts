@@ -108,3 +108,12 @@ export async function transcribeVoice(audioBlob: Blob): Promise<string> {
     const data = await res.json();
     return data.text;
 }
+
+export async function linkWhatsAppPhone(phoneNumber: string): Promise<void> {
+    const res = await fetch(`${API_BASE}/user/link-phone`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber }),
+    });
+    if (!res.ok) throw new Error('Failed to link phone');
+}

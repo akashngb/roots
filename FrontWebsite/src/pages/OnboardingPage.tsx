@@ -76,7 +76,7 @@ export const OnboardingPage = () => {
     } else {
       loginWithRedirect({
         authorizationParams: {
-          redirect_uri: window.location.origin + '/dashboard'
+          redirect_uri: window.location.origin + '/phone-link'
         }
       });
     }
