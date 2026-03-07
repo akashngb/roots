@@ -55,34 +55,34 @@ export const LandingPage = () => {
 
       {/* Hero Section - Editorial Split */}
       <section className="relative z-10 border-b border-ink">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-[85vh]">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2">
           {/* Left: Text Content */}
-          <div className="p-8 lg:p-24 flex flex-col justify-center border-r border-ink bg-white/30 backdrop-blur-sm">
+          <div className="p-8 lg:p-12 lg:py-16 flex flex-col justify-center border-r border-ink bg-white/30 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="inline-block px-4 py-1 bg-mint text-forest text-[9px] font-bold uppercase tracking-[0.3em] rounded mb-10 border border-forest/10">
+              <div className="inline-block px-4 py-1 bg-mint text-forest text-[9px] font-bold uppercase tracking-[0.3em] rounded mb-6 border border-forest/10">
                 Protocol v2.4 • Active
               </div>
-              <h1 className="text-7xl md:text-[140px] font-serif font-bold text-forest mb-12 leading-[0.82] tracking-[-0.05em]">
+              <h1 className="text-6xl md:text-[90px] font-serif font-bold text-forest mb-6 leading-[0.85] tracking-tight">
                 A clearer <br />
                 <span className="italic text-terracotta skew-x-[-10deg] inline-block">pathway</span> <br />
                 to Canada.
               </h1>
-              <p className="text-2xl text-charcoal/70 max-w-lg mb-16 leading-relaxed font-light">
+              <p className="text-xl text-charcoal/70 max-w-lg mb-10 leading-relaxed font-light">
                 49th is a curated intelligence companion designed to navigate the complexities of Canadian life — from document filing to community integration.
               </p>
-              <div className="flex flex-wrap gap-8">
+              <div className="flex flex-wrap gap-6">
                 <button
                   onClick={() => navigate('/onboarding')}
-                  className="px-12 py-6 bg-forest text-cream rounded font-bold text-xl hover:bg-forest/90 transition-all flex items-center gap-4 group shadow-2xl shadow-forest/20"
+                  className="px-8 py-4 bg-forest text-cream rounded font-bold text-lg hover:bg-forest/90 transition-all flex items-center gap-4 group shadow-xl shadow-forest/20"
                 >
                   Start your journey
-                  <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                 </button>
-                <div className="flex items-center gap-4 px-8 py-6 border border-ink rounded font-bold text-charcoal/60 hover:bg-white transition-colors cursor-pointer text-sm uppercase tracking-widest">
+                <div className="flex items-center gap-4 px-6 py-4 border border-ink rounded font-bold text-charcoal/60 hover:bg-white transition-colors cursor-pointer text-sm uppercase tracking-widest">
                   Explore Engine
                 </div>
               </div>
@@ -90,48 +90,48 @@ export const LandingPage = () => {
           </div>
 
           {/* Right: Visual Content */}
-          <div className="relative bg-taupe/10 overflow-hidden flex items-center justify-center p-8 lg:p-0">
+          <div className="relative bg-taupe/10 overflow-hidden flex items-center justify-center p-8 lg:p-12 lg:py-16">
             <div className="absolute inset-0 opacity-40 pointer-events-none">
-              <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-mint rounded-full blur-[150px]" />
-              <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-terracotta/20 rounded-full blur-[150px]" />
+              <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-mint rounded-full blur-[120px]" />
+              <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-terracotta/20 rounded-full blur-[120px]" />
             </div>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="relative z-10 w-full max-w-md aspect-[3/4] bg-white rounded-[3rem] shadow-[0_60px_120px_rgba(0,0,0,0.12)] border border-ink overflow-hidden flex flex-col"
+              className="relative z-10 w-full max-w-[380px] bg-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.1)] border border-ink overflow-hidden flex flex-col"
             >
-              <div className="p-10 border-b border-ink flex items-center justify-between bg-cream/30">
+              <div className="p-6 md:p-8 border-b border-ink flex items-center justify-between bg-cream/30">
                 <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-[0.4em] text-charcoal/30 font-bold mb-2">Current Protocol</span>
-                  <span className="font-serif text-2xl font-bold text-forest">Arrival Engine</span>
+                  <span className="text-[9px] uppercase tracking-[0.4em] text-charcoal/30 font-bold mb-1">Current Protocol</span>
+                  <span className="font-serif text-xl font-bold text-forest">Arrival Engine</span>
                 </div>
-                <div className="w-14 h-14 rounded-2xl border border-ink flex items-center justify-center bg-white shadow-inner">
-                  <Sparkles size={24} className="text-terracotta" />
+                <div className="w-12 h-12 rounded-xl border border-ink flex items-center justify-center bg-white shadow-inner">
+                  <Sparkles size={20} className="text-terracotta" />
                 </div>
               </div>
-              <div className="flex-1 p-10 space-y-8">
+              <div className="flex-1 p-6 md:p-8 space-y-6">
                 {[
                   { label: "Identity Verification", status: "Verified", color: "text-forest" },
                   { label: "Settlement Roadmap", status: "In Progress", color: "text-terracotta" },
                   { label: "Community Access", status: "Pending", color: "text-charcoal/20" },
                   { label: "Career Alignment", status: "Pending", color: "text-charcoal/20" }
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between border-b border-ink/5 pb-6">
-                    <span className="text-sm font-bold text-charcoal/50 uppercase tracking-widest">{item.label}</span>
-                    <span className={`text-[10px] uppercase tracking-[0.2em] font-bold ${item.color}`}>{item.status}</span>
+                  <div key={i} className="flex items-center justify-between border-b border-ink/5 pb-4">
+                    <span className="text-xs font-bold text-charcoal/50 uppercase tracking-widest">{item.label}</span>
+                    <span className={`text-[9px] uppercase tracking-[0.2em] font-bold ${item.color}`}>{item.status}</span>
                   </div>
                 ))}
               </div>
-              <div className="p-10 bg-forest text-cream">
-                <p className="text-[10px] opacity-50 uppercase tracking-[0.4em] font-bold mb-3">Next Directive</p>
-                <p className="font-serif text-xl leading-snug">Register for Provincial Health Insurance (OHIP)</p>
+              <div className="p-6 md:p-8 bg-forest text-cream">
+                <p className="text-[9px] opacity-50 uppercase tracking-[0.4em] font-bold mb-2">Next Directive</p>
+                <p className="font-serif text-lg leading-snug">Register for Provincial Health Insurance (OHIP)</p>
               </div>
             </motion.div>
 
             {/* Vertical Rail Text */}
-            <div className="absolute right-12 top-1/2 -translate-y-1/2 vertical-text text-[10px] uppercase tracking-[0.8em] text-charcoal/10 font-bold">
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 vertical-text text-[9px] uppercase tracking-[0.8em] text-charcoal/10 font-bold">
               ESTABLISHED 2026 • TORONTO • VANCOUVER • MONTREAL • CALGARY
             </div>
           </div>
