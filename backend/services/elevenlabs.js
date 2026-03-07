@@ -2,6 +2,7 @@ const { ElevenLabsClient } = require('@elevenlabs/elevenlabs-js');
 const twilio = require('twilio');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 // Initialize clients
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
@@ -11,7 +12,6 @@ async function uploadToStorage(audioStream) {
     const fileName = `voice_${Date.now()}_${Math.floor(Math.random() * 1000)}.ogg`;
     const publicDir = path.join(__dirname, '..', 'public', 'voice_notes');
 
-    // Ensure the directory exists
     if (!fs.existsSync(publicDir)) {
         fs.mkdirSync(publicDir, { recursive: true });
     }
@@ -22,7 +22,6 @@ async function uploadToStorage(audioStream) {
         const fileStream = fs.createWriteStream(filePath);
         audioStream.pipe(fileStream);
         fileStream.on('finish', () => {
-            // Provide a public URL via our Express static route
             const publicUrl = `${process.env.PUBLIC_URL}/public/voice_notes/${fileName}`;
             resolve(publicUrl);
         });
@@ -30,27 +29,56 @@ async function uploadToStorage(audioStream) {
     });
 }
 
+// Download a Twilio media URL (requires Basic Auth) and transcribe via ElevenLabs STT
+async function transcribeVoiceNote(mediaUrl) {
+    // 1. Download the audio from Twilio (requires auth because media is private)
+    const response = await axios.get(mediaUrl, {
+        responseType: 'arraybuffer',
+        auth: {
+            username: process.env.TWILIO_ACCOUNT_SID,
+            password: process.env.TWILIO_AUTH_TOKEN
+        }
+    });
+
+    // 2. Save temp file
+    const tmpDir = path.join(__dirname, '..', 'public', 'voice_notes');
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    const tmpFile = path.join(tmpDir, `incoming_${Date.now()}.ogg`);
+    fs.writeFileSync(tmpFile, response.data);
+
+    // 3. Transcribe via ElevenLabs STT
+    try {
+        const transcript = await elevenlabs.speechToText.convert({
+            file: fs.createReadStream(tmpFile),
+            model_id: 'scribe_v1'
+        });
+        return transcript.text;
+    } finally {
+        // Cleanup temp file
+        fs.unlink(tmpFile, () => { });
+    }
+}
+
 async function sendRootsVoiceNote(userPhoneNumber, geminiResponseText) {
     if (!process.env.ELEVENLABS_API_KEY) {
-        console.warn('Skipping ElevenLabs voice note: no API key currently provided.');
+        console.warn('Skipping ElevenLabs voice note: no API key.');
         return;
     }
 
-    // 1. Convert Gemini text to OGG/Opus for that native WhatsApp feel
+    // 1. Convert text to OGG/Opus
     const audioStream = await elevenlabs.textToSpeech.convert(
-        "JBFqnCBsd6RMkjVDRZzb", // Your supportive voice ID
+        "JBFqnCBsd6RMkjVDRZzb",
         {
             text: geminiResponseText,
-            model_id: "eleven_multilingual_v2", // Note: SDK usually uses snake_case here
-            output_format: "ogg_44100_128", // <--- CRITICAL FOR NATIVE VOICE NOTES
+            model_id: "eleven_multilingual_v2",
+            output_format: "ogg_44100_128",
             voice_settings: { stability: 0.4, similarity_boost: 0.8 }
         }
     );
 
-    // 2. Upload to your temporary local server to get a public URL 
+    // 2. Save locally and get public URL
     const publicAudioUrl = await uploadToStorage(audioStream);
 
-    // Formulate From Number correctly using the env var
     const fromNumber = process.env.TWILIO_WHATSAPP_FROM.startsWith('whatsapp:')
         ? process.env.TWILIO_WHATSAPP_FROM
         : `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}`;
@@ -59,7 +87,7 @@ async function sendRootsVoiceNote(userPhoneNumber, geminiResponseText) {
         ? userPhoneNumber
         : `whatsapp:${userPhoneNumber}`;
 
-    // 3. Send via Twilio
+    // 3. Send as voice note via Twilio
     await client.messages.create({
         from: fromNumber,
         to: toNumber,
@@ -67,4 +95,5 @@ async function sendRootsVoiceNote(userPhoneNumber, geminiResponseText) {
     });
 }
 
-module.exports = { sendRootsVoiceNote };
+module.exports = { sendRootsVoiceNote, transcribeVoiceNote };
+
