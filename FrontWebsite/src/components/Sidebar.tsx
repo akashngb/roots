@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useRootsUser } from '../hooks/useRootsUser';
 import {
   LayoutDashboard,
   Map,
@@ -33,6 +34,7 @@ const navItems = [
 ];
 
 export const Sidebar = () => {
+  const { displayName, picture, logout } = useRootsUser();
   return (
     <aside className="w-80 h-screen bg-white border-r border-ink flex flex-col sticky top-0 relative overflow-hidden grain shadow-2xl shadow-black/5">
       <div className="p-8 border-b border-ink relative z-10 bg-cream/30">
@@ -89,6 +91,18 @@ export const Sidebar = () => {
           <p className="text-[10px] text-charcoal/40 leading-relaxed font-medium">You are currently in the <span className="text-forest font-bold italic">Arrival Protocol</span> phase.</p>
         </div>
 
+        {/* User identity strip */}
+        <div className="px-2 mb-4 flex items-center gap-4">
+          {picture
+            ? <img src={picture} className="w-10 h-10 rounded-full border border-ink" />
+            : <div className="w-10 h-10 rounded-full bg-forest flex items-center justify-center text-cream font-serif font-bold">{displayName[0]}</div>
+          }
+          <div className="flex flex-col min-w-0">
+            <span className="text-[11px] font-bold text-charcoal truncate">{displayName}</span>
+            <span className="text-[9px] uppercase tracking-[0.3em] text-charcoal/30 font-bold">Active</span>
+          </div>
+        </div>
+
         <div className="mt-6 flex gap-2">
           <NavLink
             to="/dashboard/settings"
@@ -99,7 +113,10 @@ export const Sidebar = () => {
           >
             <Settings size={20} />
           </NavLink>
-          <button className="flex-1 flex items-center justify-center p-4 rounded-2xl border border-ink bg-white text-terracotta hover:bg-terracotta hover:text-white transition-all duration-300">
+          <button
+            onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+            className="flex-1 flex items-center justify-center p-4 rounded-2xl border border-ink bg-white text-terracotta hover:bg-terracotta hover:text-white transition-all duration-300"
+          >
             <LogOut size={20} />
           </button>
         </div>
