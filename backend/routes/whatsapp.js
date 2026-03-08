@@ -49,17 +49,53 @@ router.post('/', async (req, res) => {
         isImage = true;
         console.log('📄 Received image/document from', from);
 
-        const uploadResult = await cloudinary.uploader.upload(mediaUrl, { folder: 'roots_intake' });
-        console.log('☁️ Uploaded to Cloudinary:', uploadResult.secure_url);
+        // Securely download the image buffer first utilizing Twilio credentials
+        const authHeader = 'Basic ' + Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64');
+        const mediaRes = await axios.get(mediaUrl, {
+          responseType: 'arraybuffer',
+          headers: { Authorization: authHeader }
+        });
 
-        const extractedData = await extractDocumentData(uploadResult.secure_url);
+        // Use the cloudinary stream to upload the buffer, but apply enhancements
+        const imageBuffer = Buffer.from(mediaRes.data);
+        const cloudinaryUrl = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              resource_type: 'image',
+              public_id: `roots_doc_${Date.now()}`,
+              folder: 'roots_intake',
+              transformation: [
+                { effect: "enhance" },
+                { effect: "sharpen:100" },
+                { effect: "auto_contrast" }
+              ]
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result.secure_url);
+            }
+          );
+          uploadStream.end(imageBuffer);
+        });
+
+        console.log('☁️ Uploaded to Cloudinary with enhancements:', cloudinaryUrl);
+
+        const extractedData = await extractDocumentData(cloudinaryUrl);
         console.log('📋 Extracted Data:', extractedData);
 
-        const docReply = `I've processed your *${extractedData.docType}* 📄\n\n*Next step:* ${extractedData.nextStep}\n\nIs there anything else I can help you with?`;
+        const docReply = JSON.stringify({
+          message: `✨ Here is your enhanced document!\n\nI've successfully processed your ${extractedData.docType}.\n\nNext step: ${extractedData.nextStep}.`,
+          card: {
+            type: "applicationBreakdown",
+            options: {
+              extractedInfo: extractedData
+            }
+          }
+        });
 
         if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
           const { sendWhatsAppMessage } = require('../services/twilio');
-          await sendWhatsAppMessage(from, docReply);
+          await sendWhatsAppMessage(from, docReply, cloudinaryUrl);
         }
         return; // Document handled — exit early
       }
