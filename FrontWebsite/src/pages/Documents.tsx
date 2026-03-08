@@ -19,6 +19,15 @@ import {
   answerBrowserQuestion
 } from '../api';
 import { BrowserTaskPanel, type BrowserPanel } from '../components/BrowserTaskPanel';
+import { AdvancedImage, placeholder, lazyload } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
+import { format, quality } from '@cloudinary/url-gen/actions/delivery';
+import { auto } from '@cloudinary/url-gen/qualifiers/format';
+import { auto as autoQuality } from '@cloudinary/url-gen/qualifiers/quality';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { cld } from '../cloudinary/config';
+import { UploadWidget } from '../cloudinary/UploadWidget';
+import type { CloudinaryUploadResult } from '../cloudinary/UploadWidget';
 
 const docs = [
   {
@@ -62,6 +71,23 @@ const docs = [
 export const Documents = () => {
   const [panel, setPanel] = useState<BrowserPanel | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [uploadedImageId, setUploadedImageId] = useState<string | null>(null);
+
+  const handleUploadSuccess = (result: CloudinaryUploadResult) => {
+    console.log('Upload successful:', result);
+    setUploadedImageId(result.public_id);
+  };
+
+  const handleUploadError = (error: Error) => {
+    console.error('Upload error:', error);
+    alert(`Upload failed: ${error.message}`);
+  };
+
+  const displayImage = cld
+    .image(uploadedImageId || 'samples/people/bicycle')
+    .resize(fill().width(400).height(300).gravity(autoGravity()))
+    .delivery(format(auto()))
+    .delivery(quality(autoQuality()));
 
   const startPolling = () => {
     if (pollRef.current) clearInterval(pollRef.current);
@@ -263,6 +289,33 @@ export const Documents = () => {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Cloudinary Upload Card */}
+          <div className="bg-white p-10 rounded-[3rem] border border-taupe card-shadow">
+            <div className="flex items-center gap-3 mb-8">
+              <span className="w-8 h-[1px] bg-charcoal/20"></span>
+              <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-charcoal/40">ID Verification</h3>
+            </div>
+            <p className="text-sm text-charcoal/60 mb-6 font-light">Securely upload a photo of your identification documents.</p>
+            <div className="mb-6 flex justify-center">
+              <UploadWidget
+                onUploadSuccess={handleUploadSuccess}
+                onUploadError={handleUploadError}
+                buttonText="Upload ID Image"
+                className="w-full py-4 bg-terracotta text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-terracotta/90 transition-all shadow-xl"
+              />
+            </div>
+            {uploadedImageId && (
+              <div className="rounded-2xl overflow-hidden border border-taupe/30">
+                <AdvancedImage
+                  cldImg={displayImage}
+                  plugins={[placeholder({ mode: 'blur' }), lazyload()]}
+                  alt="Uploaded ID"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
