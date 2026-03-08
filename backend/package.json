@@ -13,6 +13,7 @@
   "dependencies": {
     "@elevenlabs/elevenlabs-js": "^2.38.1",
     "@google/generative-ai": "^0.24.1",
+    "auth0": "^5.4.0",
     "axios": "^1.13.6",
     "backboard-sdk": "^1.5.3",
     "cors": "^2.8.6",
