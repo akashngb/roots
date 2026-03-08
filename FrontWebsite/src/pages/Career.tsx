@@ -66,7 +66,7 @@ export const Career = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
         {/* Left Side - Pathway Selection */}
         <div className="lg:col-span-4 space-y-12">
-          <div className="bg-white p-12 rounded-[3rem] border border-ink shadow-2xl shadow-black/5 relative overflow-hidden">
+          <div className="bg-white p-12 rounded-lg border border-ink shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-5">
               <TrendingUp size={64} />
             </div>
@@ -106,7 +106,7 @@ export const Career = () => {
 
           <motion.div
             whileHover={{ y: -10 }}
-            className="bg-terracotta text-white p-16 rounded-[4rem] shadow-2xl shadow-terracotta/30 relative overflow-hidden group"
+            className="bg-terracotta text-white p-16 rounded-lg shadow-sm relative overflow-hidden group"
           >
             <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:opacity-20 transition-opacity">
               <Award size={120} />
@@ -123,7 +123,7 @@ export const Career = () => {
 
         {/* Right Side - Pathway Details */}
         <div className="lg:col-span-8 space-y-12">
-          <div className="bg-white p-16 md:p-20 rounded-[4rem] border border-ink shadow-2xl shadow-black/5 relative overflow-hidden">
+          <div className="bg-white p-16 md:p-20 rounded-lg border border-ink shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5">
               <GraduationCap size={160} />
             </div>
@@ -136,7 +136,7 @@ export const Career = () => {
                 <h3 className="text-7xl font-serif font-bold text-forest leading-none tracking-tight italic">{selectedProfession}</h3>
                 <p className="text-2xl text-charcoal/40 font-light max-w-xl">The architectural roadmap to professional licensing.</p>
               </div>
-              <div className="w-32 h-32 bg-mint rounded-[2.5rem] flex items-center justify-center text-forest shadow-2xl shadow-mint/20">
+              <div className="w-32 h-32 bg-mint rounded-lg flex items-center justify-center text-forest">
                 <GraduationCap size={64} />
               </div>
             </div>
@@ -153,7 +153,7 @@ export const Career = () => {
               ].map((step, i) => (
                 <div key={i} className="flex gap-16 relative z-10 group">
                   <div className={cn(
-                    "w-20 h-20 rounded-[1.5rem] flex items-center justify-center shrink-0 transition-all duration-700 border",
+                    "w-20 h-20 rounded-lg flex items-center justify-center shrink-0 transition-all duration-700 border",
                     step.status === 'done' ? "bg-forest text-white shadow-2xl shadow-forest/30 border-forest" :
                       step.status === 'ready' ? "bg-white border-forest text-forest shadow-2xl shadow-forest/10" :
                         "bg-white border-ink text-charcoal/20"
@@ -161,7 +161,7 @@ export const Career = () => {
                     {step.status === 'done' ? <CheckCircle2 size={32} /> : <span className="font-mono font-bold text-2xl">0{i + 1}</span>}
                   </div>
                   <div className={cn(
-                    "flex-1 p-12 rounded-[3rem] border transition-all duration-700",
+                    "flex-1 p-12 rounded-lg border transition-all duration-700",
                     step.status === 'ready' ? "bg-cream border-forest/30 shadow-2xl shadow-forest/5" : "bg-white border-ink group-hover:border-forest/20"
                   )}>
                     <div className="flex items-center justify-between mb-6">
@@ -183,7 +183,7 @@ export const Career = () => {
 
           {/* Job Readiness & Bridging */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-white p-16 rounded-[4rem] border border-ink shadow-2xl shadow-black/5 relative overflow-hidden">
+            <div className="bg-white p-16 rounded-lg border border-ink shadow-sm relative overflow-hidden">
               <div className="absolute top-0 right-0 p-10 opacity-5">
                 <ShieldCheck size={64} />
               </div>
@@ -214,7 +214,7 @@ export const Career = () => {
               </div>
             </div>
 
-            <div className="bg-mint/20 p-16 rounded-[4rem] border border-mint/30 relative overflow-hidden group">
+            <div className="bg-mint/20 p-16 rounded-lg border border-mint/30 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Sparkles size={80} />
               </div>
