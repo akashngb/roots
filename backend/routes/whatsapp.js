@@ -15,7 +15,8 @@ router.post('/', async (req, res) => {
   const from = req.body.From;
   const mediaUrl = req.body.MediaUrl0;
 
-  res.status(200).send('OK');
+  res.set('Content-Type', 'text/xml');
+  res.status(200).send('<Response></Response>');
 
   try {
     let responseText = '';
