@@ -14,6 +14,9 @@ export function useRootsUser() {
     const ohipRegistered = claims?.[`${NS}/ohip_registered`] || false;
     const criticalPathProgress = claims?.[`${NS}/critical_path_progress`] || 0;
     const arrivalDate = claims?.[`${NS}/arrival_date`] || null;
+    const role = (claims?.[`${NS}/role`] || 'primary') as 'primary' | 'family';
+    const isPrimary = role === 'primary';
+    const isFamily = role === 'family';
 
     return {
         user,
@@ -32,5 +35,8 @@ export function useRootsUser() {
         ohipRegistered,
         criticalPathProgress,
         arrivalDate,
+        role,
+        isPrimary,
+        isFamily,
     };
 }
