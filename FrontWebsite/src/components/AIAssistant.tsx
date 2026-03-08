@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, X, MessageCircle, Sparkles, User, Bot, Volume2, Mic, Square, Maximize2, Minimize2 } from 'lucide-react';
+import { Send, X, MessageCircle, Sparkles, User, Bot, Volume2, Mic, Square, Maximize2, Minimize2, Paperclip } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -9,7 +9,7 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-import { runBrowserTask } from '../api';
+import { runBrowserTask, uploadDocument } from '../api';
 
 interface Message {
   id: string;
@@ -36,6 +36,7 @@ export const AIAssistant = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const userId = useRef<string>(`user_${Math.random().toString(36).slice(2, 9)}`);
 
   useEffect(() => {
@@ -43,6 +44,23 @@ export const AIAssistant = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
+
+  useEffect(() => {
+    const handleOpenChat = (e: any) => {
+      setIsOpen(true);
+      if (e.detail?.message) {
+        setTimeout(() => {
+          const btn = document.getElementById('ai-hidden-send-btn');
+          if (btn) {
+            btn.dataset.msg = e.detail.message;
+            btn.click();
+          }
+        }, 400);
+      }
+    };
+    window.addEventListener('open-ai-chat', handleOpenChat);
+    return () => window.removeEventListener('open-ai-chat', handleOpenChat);
+  }, []);
 
   // Poll for browser agent questions and results when browser task is active
   useEffect(() => {
@@ -136,6 +154,43 @@ export const AIAssistant = () => {
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Add user message about upload
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      text: `📎 _Uploaded document: ${file.name}_`,
+      sender: 'user',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, userMsg]);
+    setIsTyping(true);
+
+    try {
+      const responseText = await uploadDocument(file);
+      const botMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        text: responseText,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMsg]);
+    } catch (err) {
+      console.error('File upload failed:', err);
+      const botMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm sorry, I couldn't process that document. Please try again with a PDF or text file.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMsg]);
+    }
+    setIsTyping(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSend = async (overrideText?: string) => {
     const textToSend = overrideText || input;
     if (!textToSend.trim()) return;
@@ -223,6 +278,7 @@ export const AIAssistant = () => {
 
   return (
     <>
+      <button id="ai-hidden-send-btn" onClick={(e) => handleSend(e.currentTarget.dataset.msg)} className="hidden" />
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 bg-forest text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50"
@@ -331,12 +387,27 @@ export const AIAssistant = () => {
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                   placeholder={isRecording ? "Listening..." : "Ask me anything..."}
                   className={cn(
-                    "w-full pl-4 pr-24 py-3 bg-cream/50 border border-taupe rounded-xl focus:outline-none focus:border-forest text-sm transition-all",
+                    "w-full pl-4 pr-32 py-3 bg-cream/50 border border-taupe rounded-xl focus:outline-none focus:border-forest text-sm transition-all",
                     isRecording && "ring-2 ring-forest/20 bg-forest/5"
                   )}
                   disabled={isRecording}
                 />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept=".pdf,.txt,.doc,.docx"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isRecording || isTyping}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-forest/10 text-forest hover:bg-forest/20 transition-all disabled:opacity-50"
+                    title="Upload Document"
+                  >
+                    <Paperclip size={16} />
+                  </button>
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
                     className={cn(
@@ -351,7 +422,7 @@ export const AIAssistant = () => {
                   </button>
                   <button
                     onClick={() => handleSend()}
-                    disabled={isRecording}
+                    disabled={isRecording || !input.trim()}
                     className="w-8 h-8 bg-forest text-white rounded-lg flex items-center justify-center hover:bg-forest/90 transition-colors disabled:opacity-50"
                   >
                     <Send size={16} />

@@ -140,54 +140,74 @@ export const OnboardingPage = () => {
 
   if (isComplete) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-8 overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-5xl w-full bg-white rounded-[4rem] p-16 md:p-24 shadow-2xl border border-ink text-center relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-forest/5 rounded-full -mr-80 -mt-80 blur-[100px]" />
-          <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-terracotta/5 rounded-full -ml-80 -mb-80 blur-[100px]" />
+      <div className="h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-cream">
 
-          <div className="w-32 h-32 bg-forest text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-16 shadow-2xl shadow-forest/30">
-            <CheckCircle2 size={64} />
+        {/* Left Side: Welcome Message & CTA */}
+        <div className="flex-1 lg:max-w-xl bg-forest p-8 lg:p-16 flex flex-col justify-center lg:justify-between text-white relative">
+          <div className="relative z-10 hidden lg:block">
+            <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-12 rounded-sm">
+              <CheckCircle2 size={24} className="text-mint" />
+            </div>
           </div>
-          <h1 className="text-6xl md:text-[100px] font-serif font-bold text-forest mb-10 tracking-[-0.04em] leading-[0.85]">
-            Welcome home, <br />
-            <span className="italic text-terracotta skew-x-[-10deg] inline-block">{formData.name || 'Newcomer'}.</span>
-          </h1>
-          <p className="text-2xl text-charcoal/50 mb-20 font-light max-w-3xl mx-auto leading-relaxed">
-            The architecture of your new life is ready. We've synthesized your context into a <span className="text-charcoal font-bold italic underline decoration-mint underline-offset-8">30-day masterplan</span>.
-          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-20 text-left">
+          <div className="relative z-10 flex-1 flex flex-col justify-center lg:justify-start">
+            <h1 className="text-4xl lg:text-6xl font-serif font-bold mb-6 tracking-tight leading-[1.1]">
+              Welcome home, <br />
+              <span className="italic text-terracotta">{formData.name || 'Newcomer'}.</span>
+            </h1>
+
+            <p className="text-base lg:text-lg text-white/70 leading-relaxed font-medium max-w-md mb-12">
+              The architecture of your new life is ready. We've synthesized your context into a <span className="font-bold text-white border-b border-white/30 pb-0.5">30-day masterplan</span>.
+            </p>
+
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="inline-flex py-4 px-8 bg-white text-forest rounded-sm text-[10px] uppercase tracking-widest font-bold transition-all hover:bg-cream hover:text-forest items-center justify-between group w-full lg:w-auto self-start mt-auto lg:mt-0 shadow-xl shadow-black/10"
+            >
+              Enter dashboard <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform ml-8" />
+            </button>
+          </div>
+
+          {/* Subtle background grain/gradient for depth */}
+          <div className="absolute inset-0 bg-charcoal/5 pointer-events-none" />
+        </div>
+
+        {/* Right Side: The Itinerary */}
+        <div className="flex-[1.5] bg-cream p-8 lg:p-16 flex items-center justify-center relative shadow-[-20px_0_40px_rgba(0,0,0,0.02)] z-10">
+          <div className="w-full max-w-2xl mx-auto space-y-6 lg:space-y-10">
             {aiTasks.length > 0 ? (
               <>
-                <div className="p-12 bg-mint/10 rounded-[3rem] border border-ink group hover:bg-mint/20 transition-all duration-700">
-                  <h3 className="text-[10px] font-bold text-forest mb-8 flex items-center gap-4 uppercase tracking-[0.4em]">
-                    <Sparkles size={20} /> Critical (Week 1)
-                  </h3>
-                  <ul className="space-y-6 text-forest/80 font-serif italic text-2xl">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-12 items-start sm:items-baseline">
+                  <div className="w-32 flex-shrink-0 text-[9px] font-bold text-forest uppercase tracking-[0.2em]">
+                    Critical (Week 1)
+                  </div>
+                  <ul className="flex-1 space-y-2 lg:space-y-4 font-serif text-lg lg:text-2xl text-charcoal/90">
                     {aiTasks.filter(t => t.urgency === 'critical').slice(0, 3).map((t, i) => (
                       <li key={i}>{t.title}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="p-12 bg-terracotta/5 rounded-[3rem] border border-ink group hover:bg-terracotta/10 transition-all duration-700">
-                  <h3 className="text-[10px] font-bold text-terracotta mb-8 flex items-center gap-4 uppercase tracking-[0.4em]">
-                    <Calendar size={20} /> High Priority
-                  </h3>
-                  <ul className="space-y-6 text-terracotta/80 font-serif italic text-2xl">
+
+                <div className="w-full h-px bg-ink/30" />
+
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-12 items-start sm:items-baseline">
+                  <div className="w-32 flex-shrink-0 text-[9px] font-bold text-terracotta uppercase tracking-[0.2em]">
+                    High Priority
+                  </div>
+                  <ul className="flex-1 space-y-2 lg:space-y-4 font-serif text-lg lg:text-2xl text-charcoal/90">
                     {aiTasks.filter(t => t.urgency === 'high').slice(0, 3).map((t, i) => (
                       <li key={i}>{t.title}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="p-12 bg-charcoal/5 rounded-[3rem] border border-ink group hover:bg-charcoal/10 transition-all duration-700">
-                  <h3 className="text-[10px] font-bold text-charcoal mb-8 flex items-center gap-4 uppercase tracking-[0.4em]">
-                    <Briefcase size={20} /> Coming Up
-                  </h3>
-                  <ul className="space-y-6 text-charcoal/70 font-serif italic text-2xl">
+
+                <div className="w-full h-px bg-ink/30" />
+
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-12 items-start sm:items-baseline">
+                  <div className="w-32 flex-shrink-0 text-[9px] font-bold text-charcoal uppercase tracking-[0.2em]">
+                    Coming Up
+                  </div>
+                  <ul className="flex-1 space-y-2 lg:space-y-4 font-serif text-lg lg:text-2xl text-charcoal/70 italic">
                     {aiTasks.filter(t => t.urgency === 'medium' || t.urgency === 'low').slice(0, 3).map((t, i) => (
                       <li key={i}>{t.title}</li>
                     ))}
@@ -196,39 +216,46 @@ export const OnboardingPage = () => {
               </>
             ) : (
               <>
-                <div className="p-12 bg-mint/10 rounded-[3rem] border border-ink group hover:bg-mint/20 transition-all duration-700">
-                  <h3 className="text-[10px] font-bold text-forest mb-8 flex items-center gap-4 uppercase tracking-[0.4em]">
-                    <Sparkles size={20} /> First Steps
-                  </h3>
-                  <ul className="space-y-6 text-forest/80 font-serif italic text-2xl">
-                    <li>Apply for SIN</li>
-                    <li>Open Bank Account</li>
-                    <li>Get SIM Card</li>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-12 items-start sm:items-baseline text-left">
+                  <div className="w-32 flex-shrink-0 text-[9px] font-bold text-forest uppercase tracking-[0.2em]">
+                    First Steps
+                  </div>
+                  <ul className="flex-1 space-y-2 lg:space-y-4 font-serif text-lg lg:text-2xl text-charcoal/90">
+                    <li>Apply for Social Insurance Number (SIN)</li>
+                    <li>Open a Canadian Bank Account</li>
+                    <li>Obtain a local SIM Card</li>
                   </ul>
                 </div>
-                <div className="p-12 bg-terracotta/5 rounded-[3rem] border border-ink group hover:bg-terracotta/10 transition-all duration-700">
-                  <h3 className="text-[10px] font-bold text-terracotta mb-8 flex items-center gap-4 uppercase tracking-[0.4em]">
-                    <Calendar size={20} /> 30-Day Goal
-                  </h3>
-                  <ul className="space-y-6 text-terracotta/80 font-serif italic text-2xl">
-                    <li>Health Card</li>
-                    <li>School Enrollment</li>
-                    <li>Housing Search</li>
+
+                <div className="w-full h-px bg-ink/30" />
+
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-12 items-start sm:items-baseline text-left">
+                  <div className="w-32 flex-shrink-0 text-[9px] font-bold text-terracotta uppercase tracking-[0.2em]">
+                    30-Day Goal
+                  </div>
+                  <ul className="flex-1 space-y-2 lg:space-y-4 font-serif text-lg lg:text-2xl text-charcoal/90">
+                    <li>Apply for Provincial Health Card</li>
+                    <li>Initiate School Enrollment</li>
+                    <li>Begin Long-term Housing Search</li>
                   </ul>
                 </div>
-                <div className="p-12 bg-charcoal/5 rounded-[3rem] border border-ink group hover:bg-charcoal/10 transition-all duration-700">
-                  <h3 className="text-[10px] font-bold text-charcoal mb-8 flex items-center gap-4 uppercase tracking-[0.4em]">
-                    <Briefcase size={20} /> Career Path
-                  </h3>
-                  <ul className="space-y-6 text-charcoal/70 font-serif italic text-2xl">
-                    <li>Credential Review</li>
-                    <li>Resume Workshop</li>
-                    <li>Local Networking</li>
+
+                <div className="w-full h-px bg-ink/30" />
+
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-12 items-start sm:items-baseline text-left">
+                  <div className="w-32 flex-shrink-0 text-[9px] font-bold text-charcoal uppercase tracking-[0.2em]">
+                    Career Path
+                  </div>
+                  <ul className="flex-1 space-y-2 lg:space-y-4 font-serif text-lg lg:text-2xl text-charcoal/70 italic">
+                    <li>Submit Credential Review</li>
+                    <li>Attend Resume Workshop</li>
+                    <li>Join Local Networking Events</li>
                   </ul>
                 </div>
               </>
             )}
           </div>
+<<<<<<< HEAD
 
           <button
             onClick={handleEnterDashboard}
@@ -237,29 +264,23 @@ export const OnboardingPage = () => {
             Enter your dashboard <ArrowRight size={24} className="group-hover:translate-x-4 transition-transform" />
           </button>
         </motion.div>
+=======
+        </div>
+>>>>>>> d26bd58295af0a4e02df15cfacdb32076488edd7
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-8 overflow-hidden">
-      <div className="max-w-7xl w-full flex flex-col lg:flex-row gap-32 items-center">
+      <div className="max-w-6xl w-full flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
         {/* Left Side - Info */}
-        <div className="flex-1 space-y-16">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="w-20 h-20 bg-forest rounded-[2rem] flex items-center justify-center text-white shadow-2xl shadow-forest/30"
-          >
-            <Sparkles size={40} />
-          </motion.div>
-          <div className="space-y-10">
-            <h2 className="text-7xl md:text-[120px] font-serif font-bold text-forest leading-[0.82] tracking-[-0.04em]">
-              The <br />
-              <span className="text-terracotta italic skew-x-[-10deg] inline-block">Personal</span> <br />
-              Roadmap.
+        <div className="flex-1 space-y-10">
+          <div className="space-y-6">
+            <h2 className="text-4xl md:text-6xl font-serif font-bold text-forest leading-[1.1] tracking-tight">
+              The Personal Roadmap.
             </h2>
-            <p className="text-2xl text-charcoal/50 leading-relaxed font-light max-w-lg">
+            <p className="text-lg text-charcoal/60 leading-relaxed max-w-lg">
               Every journey to Canada is unique. By sharing your context, we architect the exact guidance you need for your specific situation.
             </p>
           </div>
@@ -275,47 +296,44 @@ export const OnboardingPage = () => {
         </div>
 
         {/* Right Side - Form */}
-        <div className="flex-1 w-full relative">
-          <div className="absolute -inset-10 bg-forest/5 rounded-[5rem] blur-[80px]" />
+        <div className="flex-1 w-full max-w-xl mx-auto">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative bg-white rounded-[4rem] p-16 md:p-20 shadow-2xl border border-ink"
+            className="bg-white p-8 md:p-12 border border-ink"
           >
-            <div className="flex items-center gap-10 mb-16">
-              <div className="w-20 h-20 bg-cream rounded-[2rem] flex items-center justify-center text-forest shadow-inner border border-ink/5">
-                <step.icon size={40} />
+            <div className="flex flex-col gap-4 mb-10">
+              <div className="flex items-center gap-3">
+                <step.icon size={24} className="text-forest" />
+                <h3 className="text-2xl font-serif font-bold text-charcoal leading-tight">{step.title}</h3>
               </div>
-              <div>
-                <h3 className="text-4xl font-serif font-bold text-charcoal leading-tight">{step.title}</h3>
-                <p className="text-[10px] text-charcoal/30 uppercase tracking-[0.4em] mt-3 font-bold">{step.subtitle}</p>
-              </div>
+              <p className="text-xs text-charcoal/50 font-medium">{step.subtitle}</p>
             </div>
 
-            <div className="space-y-12 mb-20">
+            <div className="space-y-8 mb-12">
               {step.fields.map((field) => (
-                <div key={field.name} className="group">
-                  <label className="block text-[10px] font-bold uppercase tracking-[0.3em] text-charcoal/40 mb-6 group-focus-within:text-forest transition-colors">{field.label}</label>
+                <div key={field.name} className="flex flex-col gap-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-charcoal/70">{field.label}</label>
                   {field.type === 'select' ? (
                     <div className="relative">
                       <select
-                        className="w-full px-10 py-6 bg-cream/30 border border-ink rounded-md focus:outline-none focus:ring-4 focus:ring-mint/20 text-charcoal font-medium tracking-wide appearance-none cursor-pointer"
+                        className="w-full px-4 py-3 bg-white border border-ink rounded focus:outline-none focus:border-forest text-sm text-charcoal font-medium appearance-none cursor-pointer"
                         onChange={(e) => handleChange(field.name, e.target.value)}
                         value={formData[field.name] || ''}
                       >
                         <option value="">Select an option</option>
                         {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                       </select>
-                      <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-charcoal/30">
-                        <ArrowRight size={20} className="rotate-90" />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-charcoal/30">
+                        <ArrowRight size={16} className="rotate-90" />
                       </div>
                     </div>
                   ) : (
                     <input
                       type={field.type}
                       placeholder={field.placeholder}
-                      className="w-full px-10 py-6 bg-cream/30 border border-ink rounded-md focus:outline-none focus:ring-4 focus:ring-mint/20 text-charcoal font-medium tracking-wide"
+                      className="w-full px-4 py-3 bg-white border border-ink rounded focus:outline-none focus:border-forest text-sm text-charcoal font-medium"
                       onChange={(e) => handleChange(field.name, e.target.value)}
                       value={formData[field.name] || ''}
                     />
@@ -324,19 +342,24 @@ export const OnboardingPage = () => {
               ))}
             </div>
 
-            <div className="flex items-center justify-between gap-10">
+            <div className="flex items-center justify-between gap-6">
               <button
                 onClick={handleBack}
-                disabled={currentStep === 0}
-                className={`flex items-center gap-4 px-10 py-6 rounded text-[10px] font-bold uppercase tracking-[0.4em] transition-all ${currentStep === 0 ? 'text-charcoal/20 cursor-not-allowed' : 'text-charcoal hover:bg-cream hover:text-forest'}`}
+                disabled={currentStep === 0 || isLoading}
+                className={`text-xs font-bold uppercase tracking-widest transition-colors ${currentStep === 0 || isLoading ? 'text-charcoal/20 cursor-not-allowed' : 'text-charcoal/60 hover:text-forest'}`}
               >
-                <ArrowLeft size={20} /> Back
+                Back
               </button>
               <button
                 onClick={handleNext}
-                className="flex-1 flex items-center justify-center gap-6 px-12 py-8 bg-forest text-white rounded text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-forest/90 transition-all shadow-2xl shadow-forest/30 group"
+                disabled={isLoading}
+                className={`flex items-center gap-3 px-8 py-4 rounded text-xs font-bold uppercase tracking-widest transition-all group ${isLoading ? 'bg-forest/50 cursor-not-allowed text-white' : 'bg-forest text-white hover:bg-forest/90'}`}
               >
-                {currentStep === steps.length - 1 ? 'Generate Roadmap' : 'Continue'} <ArrowRight size={24} className="group-hover:translate-x-4 transition-transform" />
+                {isLoading ? (
+                  <>Generating <span className="animate-pulse">...</span></>
+                ) : (
+                  <>{currentStep === steps.length - 1 ? 'Generate' : 'Continue'} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
+                )}
               </button>
             </div>
           </motion.div>

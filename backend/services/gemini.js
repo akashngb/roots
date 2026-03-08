@@ -1,3 +1,4 @@
+require('dotenv').config();
 const axios = require('axios');
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';

@@ -151,6 +151,7 @@ export async function answerBrowserQuestion(answer: string): Promise<void> {
         body: JSON.stringify({ answer }),
     });
 }
+
 export async function linkWhatsAppPhone(phoneNumber: string, auth0UserId: string): Promise<void> {
     const res = await fetch(`${API_BASE}/user/link-phone`, {
         method: 'POST',
@@ -189,4 +190,24 @@ export async function updateTaskCompletion(auth0UserId: string, taskId: string):
         body: JSON.stringify({ auth0UserId, taskId, completed: true }),
     });
     if (!res.ok) throw new Error('Failed to update task');
+}
+
+export async function searchPolicies(query: string): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/policies/search?q=${encodeURIComponent(query)}`);
+    if (!res.ok) throw new Error('Search policies request failed');
+    const data = await res.json();
+    return data.policies || [];
+}
+
+export async function uploadDocument(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('document', file);
+    const res = await fetch(`${API_BASE}/upload`, {
+        method: 'POST',
+        headers: { 'UserId': getUserId() },
+        body: formData,
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.text || 'Document uploaded successfully.';
 }
