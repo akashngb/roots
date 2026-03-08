@@ -75,9 +75,7 @@ export const LandingPage = () => {
                   Start your journey
                   <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                 </button>
-                <div className="flex items-center gap-4 px-6 py-4 border border-ink rounded font-bold text-charcoal/60 hover:bg-white transition-colors cursor-pointer text-sm uppercase tracking-widest">
-                  Explore Engine
-                </div>
+
               </div>
             </motion.div>
           </div>

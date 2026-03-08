@@ -12,6 +12,7 @@ import {
   History
 } from 'lucide-react';
 import { POLICY_ALERTS } from '../constants';
+import { searchPolicies } from '../api';
 
 export const Pulse = () => {
   const [statusInput, setStatusInput] = useState('');
@@ -19,6 +20,26 @@ export const Pulse = () => {
   const [statusMonths, setStatusMonths] = useState('');
   const [statusLoading, setStatusLoading] = useState(false);
   const [statusResponse, setStatusResponse] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [alerts, setAlerts] = useState<any[]>(POLICY_ALERTS);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!searchQuery.trim()) {
+      setAlerts(POLICY_ALERTS);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const results = await searchPolicies(searchQuery);
+      setAlerts(results);
+    } catch (e) {
+      console.error(e);
+      window.alert("Failed to reach intelligence database.");
+    }
+    setIsSearching(false);
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-32">
@@ -33,8 +54,8 @@ export const Pulse = () => {
             <span className="w-12 h-[1px] bg-forest"></span>
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-forest/60">Module 01</span>
           </motion.div>
-          <h1 className="text-6xl md:text-8xl font-serif font-bold text-forest leading-[0.85] tracking-tighter mb-8">
-            The <br />
+          <h1 className="text-6xl md:text-8xl font-serif font-bold text-forest leading-[0.85] tracking-tighter mb-8 flex items-baseline gap-4 md:gap-6">
+            The
             <span className="italic text-terracotta text-5xl md:text-7xl">Pulse.</span>
           </h1>
           <p className="text-xl text-charcoal/60 leading-relaxed font-light">
@@ -44,17 +65,23 @@ export const Pulse = () => {
         </div>
 
         <div className="flex items-center gap-4 self-start md:self-auto">
-          <button className="p-4 bg-white border border-taupe rounded-2xl text-charcoal/40 hover:text-forest transition-all shadow-sm group">
+          <button
+            onClick={() => window.alert('No new notifications at this time.')}
+            className="p-4 bg-white border border-taupe rounded-sm text-charcoal/40 hover:text-forest transition-all shadow-sm group"
+          >
             <Bell size={20} className="group-hover:scale-110 transition-transform" />
           </button>
-          <div className="relative group">
+          <form onSubmit={handleSearch} className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-forest transition-colors" size={18} />
             <input
               type="text"
-              placeholder="Search policies..."
-              className="pl-12 pr-6 py-4 bg-white border border-taupe rounded-2xl focus:outline-none focus:border-forest text-sm w-64 transition-all focus:w-80 shadow-sm"
+              placeholder="Ask an intelligence question..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 pr-6 py-4 bg-white border border-taupe rounded-sm focus:outline-none focus:border-forest text-sm w-64 transition-all focus:w-80 shadow-sm"
+              disabled={isSearching}
             />
-          </div>
+          </form>
         </div>
       </section>
 
@@ -66,87 +93,102 @@ export const Pulse = () => {
               <span className="w-8 h-[1px] bg-charcoal/20"></span>
               <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-charcoal/40">Policy Alerts</h3>
             </div>
-            <button className="text-[10px] font-bold uppercase tracking-widest text-forest hover:underline">Customize Feed</button>
+            <button
+              onClick={() => window.alert('Feed Customization module opening...')}
+              className="text-[10px] font-bold uppercase tracking-widest text-forest hover:underline"
+            >
+              Customize Feed
+            </button>
           </div>
 
-          <div className="space-y-12">
-            {POLICY_ALERTS.map((alert, i) => (
+          <div className="space-y-6">
+            {isSearching ? (
+              <div className="p-16 flex flex-col items-center justify-center gap-4 text-forest/40">
+                <div className="w-6 h-6 border-2 border-forest/20 border-t-forest animate-spin rounded-full shadow-lg" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Running Semantic Search</span>
+              </div>
+            ) : alerts.length > 0 ? alerts.map((alert, i) => (
               <motion.div
                 key={alert.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 className="group relative"
               >
-                <div className="flex items-start gap-8">
-                  <div className="hidden md:flex flex-col items-center gap-4 shrink-0">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-charcoal/30 rotate-180 [writing-mode:vertical-lr]">{alert.date}</span>
-                    <div className="w-[1px] h-full bg-taupe/30 group-hover:bg-forest transition-colors duration-700" />
+                <div className="flex items-start gap-6">
+                  <div className="hidden md:flex flex-col items-center gap-4 shrink-0 mt-8">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-charcoal/30 rotate-180 [writing-mode:vertical-lr]">{alert.date}</span>
+                    <div className="w-[1px] h-full bg-ink/30 group-hover:bg-forest transition-colors duration-500" />
                   </div>
-                  <div className="flex-1 bg-white p-10 rounded-[3rem] border border-taupe card-shadow hover:border-forest transition-all duration-700 cursor-pointer relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-forest/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-forest/10 transition-colors duration-700" />
-                    <div className="flex items-start justify-between mb-8">
+                  <div className="flex-1 bg-white p-8 border border-ink shadow-sm hover:border-forest transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col">
+                    <div className="flex items-start justify-between mb-6">
                       <div className="flex flex-wrap gap-2">
                         {alert.tags.map(tag => (
-                          <span key={tag} className="text-[10px] font-bold px-3 py-1 bg-cream text-charcoal/60 rounded-full uppercase tracking-widest border border-taupe/30">
+                          <span key={tag} className="text-[9px] font-bold px-3 py-1 bg-cream text-forest rounded-sm uppercase tracking-widest border border-forest/10">
                             {tag}
                           </span>
                         ))}
                       </div>
                     </div>
-                    <h4 className="text-3xl font-serif font-bold text-charcoal mb-4 group-hover:text-forest transition-colors duration-500 leading-tight">{alert.title}</h4>
-                    <p className="text-lg text-charcoal/60 leading-relaxed mb-10 font-light italic">
+                    <h4 className="text-2xl font-serif font-bold text-charcoal mb-3 group-hover:text-forest transition-colors duration-300 leading-tight">{alert.title}</h4>
+                    <p className="text-base text-charcoal/60 leading-relaxed max-w-2xl mb-8 font-light">
                       {alert.summary}
                     </p>
-                    <div className="flex items-center justify-between pt-8 border-t border-taupe/30">
-                      <button className="text-[10px] font-bold uppercase tracking-widest text-forest flex items-center gap-3 group/btn">
-                        Read plain-language summary <ArrowRight size={14} className="group-hover/btn:translate-x-2 transition-transform" />
+                    <div className="flex items-center justify-between pt-6 border-t border-ink/40 mt-auto">
+                      <button
+                        onClick={() => window.alert(`Opening plain-language summary document for: ${alert.title}`)}
+                        className="text-[10px] font-bold uppercase tracking-widest text-forest flex items-center gap-2 group/btn"
+                      >
+                        Read plain-language summary <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
                       </button>
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-charcoal/30">
-                        <History size={14} /> 2 min read
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-charcoal/40">
+                        <History size={12} /> 2 min read
                       </div>
                     </div>
                   </div>
                 </div>
               </motion.div>
-            ))}
+            )) : (
+              <div className="p-12 text-center text-charcoal/40 font-serif italic border border-ink/30 border-dashed rounded-sm shadow-sm bg-white/50">
+                No policies match your search query. Try asking a different question.
+              </div>
+            )}
           </div>
         </div>
 
         {/* Right Side - Status Tracker */}
         <div className="lg:col-span-5 space-y-12">
-          <div className="bg-forest rounded-[3rem] p-12 text-white shadow-2xl shadow-forest/30 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-mint/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:bg-mint/20 transition-colors duration-700" />
-            <h3 className="text-3xl font-serif font-bold mb-10 flex items-center gap-4">
-              <ShieldCheck size={32} className="text-mint" /> Status <br />Tracker.
+          <div className="bg-forest rounded-sm p-10 text-white shadow-md relative overflow-hidden group">
+            <h3 className="text-2xl font-serif font-bold mb-8 flex items-center gap-3">
+              <ShieldCheck size={24} className="text-mint" /> Status Tracker.
             </h3>
-            <div className="space-y-8 relative z-10">
+            <div className="space-y-6 relative z-10">
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">Application Type</label>
+                <label className="block text-[9px] font-bold uppercase tracking-widest opacity-60">Application Type</label>
                 <select
                   value={statusType}
                   onChange={(e) => setStatusType(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:bg-white/20 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-white/5 border border-white/20 rounded-sm px-4 py-3 text-sm focus:outline-none focus:bg-white/10 transition-all appearance-none cursor-pointer text-white"
                 >
-                  <option className="text-charcoal">Permanent Residency (Express Entry)</option>
-                  <option className="text-charcoal">Work Permit Extension</option>
-                  <option className="text-charcoal">Citizenship Application</option>
-                  <option className="text-charcoal">Study Permit</option>
-                  <option className="text-charcoal">PR - Spousal</option>
+                  <option className="text-charcoal" value="Permanent Residency (Express Entry)">Permanent Residency (Express Entry)</option>
+                  <option className="text-charcoal" value="Work Permit Extension">Work Permit Extension</option>
+                  <option className="text-charcoal" value="Citizenship Application">Citizenship Application</option>
+                  <option className="text-charcoal" value="Study Permit">Study Permit</option>
+                  <option className="text-charcoal" value="PR - Spousal">PR - Spousal</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">Months Waiting</label>
+                <label className="block text-[9px] font-bold uppercase tracking-widest opacity-60">Months Waiting</label>
                 <input
                   type="number"
                   placeholder="e.g. 6"
                   value={statusMonths}
                   onChange={(e) => setStatusMonths(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:bg-white/20 transition-all placeholder:text-white/30"
+                  className="w-full bg-white/5 border border-white/20 rounded-sm px-4 py-3 text-sm focus:outline-none focus:bg-white/10 transition-all placeholder:text-white/30 text-white"
                 />
               </div>
               {statusResponse && (
-                <div className="bg-white/10 border border-white/20 rounded-2xl p-6">
+                <div className="bg-white/10 border border-white/20 rounded-sm p-5">
                   <p className="text-sm whitespace-pre-line leading-relaxed opacity-90">{statusResponse}</p>
                 </div>
               )}
@@ -165,7 +207,7 @@ export const Pulse = () => {
                   setStatusLoading(false);
                 }}
                 disabled={statusLoading || !statusMonths}
-                className="w-full py-5 bg-white text-forest rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-mint transition-all shadow-xl shadow-black/10 disabled:opacity-50"
+                className="w-full py-4 bg-white text-forest rounded-sm text-[10px] font-bold uppercase tracking-widest hover:bg-cream transition-all shadow-sm disabled:opacity-50 mt-4"
               >
                 {statusLoading ? 'Analyzing...' : 'Track Application'}
               </button>
@@ -173,56 +215,59 @@ export const Pulse = () => {
           </div>
 
           {/* Status Insights Card */}
-          <div className="bg-white p-12 rounded-[3rem] border border-taupe card-shadow relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-terracotta/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-            <div className="flex items-center justify-between mb-12">
+          <div className="bg-white p-10 rounded-sm border border-ink shadow-sm relative overflow-hidden">
+            <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-3">
                 <span className="w-6 h-[1px] bg-charcoal/20"></span>
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-charcoal/40">Current Insight</h4>
               </div>
-              <div className="px-4 py-1.5 bg-mint/20 text-forest text-[10px] font-bold rounded-full uppercase tracking-widest border border-mint/30">Updated Today</div>
+              <div className="px-3 py-1 bg-mint/10 text-forest text-[9px] font-bold rounded-sm uppercase tracking-widest border border-forest/10">Updated Today</div>
             </div>
 
-            <div className="flex items-center gap-8 mb-12">
-              <div className="relative w-24 h-24 shrink-0">
+            <div className="flex items-center gap-6 mb-10">
+              <div className="relative w-20 h-20 shrink-0">
                 <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-taupe/20" />
+                  <circle cx="40" cy="40" r="36" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-ink" />
                   <motion.circle
-                    initial={{ strokeDashoffset: 276 }}
-                    animate={{ strokeDashoffset: 69 }}
+                    initial={{ strokeDashoffset: 226 }}
+                    animate={{ strokeDashoffset: 56.5 }}
                     transition={{ duration: 2, ease: "easeOut" }}
-                    cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="276" className="text-forest"
+                    cx="40" cy="40" r="36" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="226" className="text-forest"
                   />
                 </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-2xl font-serif font-bold text-forest">75%</div>
+                <div className="absolute inset-0 flex items-center justify-center text-xl font-serif font-bold text-forest">75%</div>
               </div>
               <div>
                 <p className="text-xl font-serif font-bold text-charcoal leading-tight">Processing <br />Confidence.</p>
-                <p className="text-[10px] text-charcoal/40 uppercase tracking-widest mt-2">Based on IRCC trends</p>
+                <p className="text-[9px] text-charcoal/40 uppercase tracking-widest mt-1">Based on IRCC trends</p>
               </div>
             </div>
 
-            <div className="space-y-6 mb-12">
-              <div className="p-8 bg-cream rounded-[2.5rem] border border-taupe/30 relative">
-                <div className="absolute -top-4 -left-4 w-8 h-8 bg-forest text-white rounded-xl flex items-center justify-center shadow-lg">
-                  <TrendingUp size={16} />
+            <div className="space-y-6 mb-10">
+              <div className="p-6 bg-cream rounded-sm border border-ink/30 relative">
+                <div className="absolute -top-3 -left-3 w-6 h-6 bg-forest text-white rounded-sm flex items-center justify-center shadow-sm">
+                  <TrendingUp size={12} />
                 </div>
-                <p className="text-lg text-charcoal/60 leading-relaxed font-light italic">
+                <p className="text-base text-charcoal/70 leading-relaxed font-light">
                   "Your application is currently in the 'Background Check' phase. This typically takes 4-6 weeks. IRCC processing speeds for Express Entry have increased by 12% this month."
                 </p>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <h5 className="text-[10px] font-bold text-charcoal/40 uppercase tracking-[0.3em] mb-6">Suggested Actions</h5>
-              <div className="space-y-4">
+            <div className="space-y-4">
+              <h5 className="text-[9px] font-bold text-charcoal/50 uppercase tracking-widest mb-4">Suggested Actions</h5>
+              <div className="space-y-3">
                 {[
                   'Ensure your biometrics are up to date',
                   'Check your email for medical request',
                   'Verify your proof of funds'
                 ].map((action, i) => (
-                  <div key={i} className="flex items-center gap-4 text-sm font-bold text-charcoal/70 group cursor-pointer">
-                    <div className="w-2 h-2 bg-terracotta rounded-full group-hover:scale-150 transition-transform" />
+                  <div
+                    key={i}
+                    onClick={() => window.alert(`Initiating action sequence: ${action}`)}
+                    className="flex items-start gap-3 text-sm font-medium text-charcoal/80 group cursor-pointer border-b border-ink/40 pb-3 last:border-0 last:pb-0 hover:bg-black/5 p-2 rounded-sm transition-colors"
+                  >
+                    <div className="w-1.5 h-1.5 bg-terracotta rounded-full mt-1.5 group-hover:bg-forest transition-colors" />
                     <span className="group-hover:text-forest transition-colors">{action}</span>
                   </div>
                 ))}

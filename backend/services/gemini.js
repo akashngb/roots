@@ -1,7 +1,7 @@
+require('dotenv').config();
 const axios = require('axios');
-
 async function generateCriticalPath(profile) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
   const prompt = `You are an expert on Canadian immigration and newcomer onboarding.
 Given this immigrant profile, generate a sequenced critical path of tasks for their first 90 days.
@@ -21,7 +21,7 @@ Return exactly this structure with 5-7 tasks:
 }
 
 async function transcribeAudio(audioBuffer, mimeType = 'audio/webm') {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
   const payload = {
     contents: [{

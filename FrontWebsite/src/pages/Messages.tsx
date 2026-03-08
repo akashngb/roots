@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Send, 
-  Phone, 
-  Video, 
-  MoreVertical, 
-  Paperclip, 
-  Mic, 
-  Smile, 
+import {
+  Send,
+  Phone,
+  Video,
+  MoreVertical,
+  Paperclip,
+  Mic,
+  Smile,
   CheckCheck,
   Search,
   Sparkles,
@@ -72,9 +72,9 @@ export const Messages = () => {
           <h2 className="text-2xl font-serif font-bold text-forest mb-6 tracking-tighter">Archive.</h2>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-            <input 
-              type="text" 
-              placeholder="Search conversations..." 
+            <input
+              type="text"
+              placeholder="Search conversations..."
               className="w-full pl-10 pr-4 py-3 bg-cream/50 border border-taupe/50 rounded-xl text-xs focus:outline-none focus:border-forest"
             />
           </div>
@@ -140,18 +140,17 @@ export const Messages = () => {
           </div>
 
           {messages.map((msg) => (
-            <motion.div 
+            <motion.div
               key={msg.id}
               initial={{ opacity: 0, y: 20, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`max-w-[80%] md:max-w-[60%] group relative ${msg.sender === 'user' ? 'order-1' : 'order-2'}`}>
-                <div className={`p-6 md:p-8 rounded-[2rem] shadow-sm relative transition-all duration-500 ${
-                  msg.sender === 'user' 
-                    ? 'bg-forest text-white rounded-tr-none shadow-xl shadow-forest/10' 
+                <div className={`p-6 md:p-8 rounded-[2rem] shadow-sm relative transition-all duration-500 ${msg.sender === 'user'
+                    ? 'bg-forest text-white rounded-tr-none shadow-xl shadow-forest/10'
                     : 'bg-white border border-taupe text-charcoal rounded-tl-none'
-                }`}>
+                  }`}>
                   <p className="text-base leading-relaxed font-light">{msg.text}</p>
                   <div className={`flex items-center justify-end gap-2 mt-4 text-[10px] font-bold uppercase tracking-widest ${msg.sender === 'user' ? 'text-white/40' : 'text-charcoal/20'}`}>
                     {msg.timestamp}
@@ -176,15 +175,15 @@ export const Messages = () => {
                 </button>
               </div>
               <div className="flex-1 relative">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Ask your companion anything..." 
+                  placeholder="Ask your companion anything..."
                   className="w-full pl-8 pr-16 py-5 bg-cream/30 border border-taupe/50 rounded-[2rem] focus:outline-none focus:border-forest text-sm font-light tracking-wide"
                 />
-                <button 
+                <button
                   onClick={handleSend}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-forest text-white rounded-2xl flex items-center justify-center hover:bg-forest/90 transition-all shadow-xl shadow-forest/20 group"
                 >
