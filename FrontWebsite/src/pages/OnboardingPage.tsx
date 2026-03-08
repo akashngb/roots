@@ -68,7 +68,7 @@ export const OnboardingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [aiTasks, setAiTasks] = useState<any[]>([]);
   const navigate = useNavigate();
-  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  const { loginWithRedirect, isAuthenticated, user } = useAuth0();
 
   const handleEnterDashboard = () => {
     if (isAuthenticated) {
@@ -103,6 +103,21 @@ export const OnboardingPage = () => {
         };
         const result = await submitOnboarding(profile);
         setAiTasks(result.tasks || []);
+
+        // Task 10 — sync profile to Auth0 user_metadata
+        if (user?.sub) {
+          const { syncProfileToAuth0 } = await import('../api');
+          syncProfileToAuth0(user.sub, {
+            city: formData.city,
+            status: formData.status,
+            profession: formData.profession,
+            country: formData.country,
+            arrivalDate: formData.arrivalDate,
+            family: formData.maritalStatus === 'Single' ? 'alone' : 'family',
+            concern: 'settling in',
+            language: formData.language || 'English',
+          }).catch(console.error);
+        }
       } catch {
         setAiTasks([]);
       }

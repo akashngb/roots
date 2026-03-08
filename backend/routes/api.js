@@ -180,15 +180,29 @@ router.get('/user/profile', (req, res) => {
   }
 });
 
-// POST /api/user/link-phone — store a user's WhatsApp phone number
-router.post('/user/link-phone', (req, res) => {
+// POST /api/user/link-phone — link WhatsApp number to Auth0 user_metadata
+const auth0Manager = require('../services/auth0Manager');
+
+router.post('/user/link-phone', async (req, res) => {
   try {
-    const { phoneNumber } = req.body;
-    if (!phoneNumber) {
-      return res.status(400).json({ error: 'phoneNumber is required' });
+    const { phoneNumber, auth0UserId } = req.body;
+    if (!phoneNumber || !auth0UserId) {
+      return res.status(400).json({ error: 'phoneNumber and auth0UserId are required' });
     }
-    // TODO: persist to database — for now acknowledge success
-    console.log(`📱 Linked WhatsApp number: ${phoneNumber}`);
+
+    await auth0Manager.linkWhatsAppNumber(auth0UserId, phoneNumber);
+
+    // Also update thread_map.json to link the WhatsApp key to this Auth0 user
+    const fs = require('fs');
+    const path = require('path');
+    const threadMapPath = path.join(__dirname, '..', 'data', 'thread_map.json');
+    let map = {};
+    try { map = JSON.parse(fs.readFileSync(threadMapPath, 'utf8')); } catch { }
+    const key = `whatsapp:${phoneNumber}`;
+    map[key] = { ...(map[key] || {}), auth0UserId };
+    fs.writeFileSync(threadMapPath, JSON.stringify(map, null, 2));
+
+    console.log(`📱 Linked WhatsApp ${phoneNumber} → Auth0 ${auth0UserId}`);
     res.json({ success: true, phoneNumber });
   } catch (err) {
     console.error('Link phone error:', err.message);
@@ -196,4 +210,82 @@ router.post('/user/link-phone', (req, res) => {
   }
 });
 
+// POST /api/user/sync-profile — push onboarding data to Auth0 user_metadata
+router.post('/user/sync-profile', async (req, res) => {
+  try {
+    const { auth0UserId, profile } = req.body;
+    if (!auth0UserId || !profile) {
+      return res.status(400).json({ error: 'auth0UserId and profile are required' });
+    }
+
+    const metadata = {
+      city: profile.city || null,
+      immigration_status: profile.status || null,
+      profession: profile.profession || null,
+      country_of_origin: profile.country || null,
+      arrival_date: profile.arrivalDate || null,
+      family_situation: profile.family || null,
+      primary_concern: profile.concern || null,
+      language: profile.language || 'English',
+      critical_path_progress: 0,
+      sin_obtained: false,
+      ohip_registered: false,
+      bank_opened: false,
+      doctor_found: false,
+    };
+
+    await auth0Manager.updateSettlementProfile(auth0UserId, metadata);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Sync profile error:', err.message);
+    res.status(500).json({ error: 'Failed to sync profile' });
+  }
+});
+
+// GET /api/user/settlement-profile — read Auth0 user_metadata for dashboard
+router.get('/user/settlement-profile', async (req, res) => {
+  try {
+    const { auth0UserId } = req.query;
+    if (!auth0UserId) return res.status(400).json({ error: 'auth0UserId is required' });
+
+    const profile = await auth0Manager.getSettlementProfile(auth0UserId);
+    res.json({ profile });
+  } catch (err) {
+    console.error('Get settlement profile error:', err.message);
+    res.status(500).json({ error: 'Failed to get profile' });
+  }
+});
+
+// POST /api/user/update-task — mark a settlement task as complete
+router.post('/user/update-task', async (req, res) => {
+  try {
+    const { auth0UserId, taskId, completed } = req.body;
+    if (!auth0UserId || !taskId) {
+      return res.status(400).json({ error: 'auth0UserId and taskId are required' });
+    }
+
+    const TASK_FIELD_MAP = {
+      sin: 'sin_obtained',
+      health: 'ohip_registered',
+      bank: 'bank_opened',
+      doctor: 'doctor_found',
+    };
+
+    const field = TASK_FIELD_MAP[taskId];
+    if (field) {
+      await auth0Manager.updateProfileField(auth0UserId, field, completed !== false);
+    }
+
+    const profile = await auth0Manager.getSettlementProfile(auth0UserId);
+    const current = profile.critical_path_progress || 0;
+    await auth0Manager.updateProfileField(auth0UserId, 'critical_path_progress', current + 1);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Update task error:', err.message);
+    res.status(500).json({ error: 'Failed to update task' });
+  }
+});
+
 module.exports = router;
+

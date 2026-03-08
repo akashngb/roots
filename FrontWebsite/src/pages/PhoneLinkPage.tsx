@@ -4,7 +4,7 @@ import { useRootsUser } from '../hooks/useRootsUser';
 import { linkWhatsAppPhone, checkUserProfile } from '../api';
 
 export const PhoneLinkPage = () => {
-    const { phone: linkedPhone } = useRootsUser();
+    const { phone: linkedPhone, auth0UserId } = useRootsUser();
     const navigate = useNavigate();
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ export const PhoneLinkPage = () => {
         setError(null);
         try {
             const fullPhone = `+1${phone}`;
-            await linkWhatsAppPhone(fullPhone);
+            await linkWhatsAppPhone(fullPhone, auth0UserId!);
             // Check if this number already has a WhatsApp profile/history
             const { hasProfile } = await checkUserProfile(fullPhone);
             navigate(hasProfile ? '/dashboard' : '/onboarding');
