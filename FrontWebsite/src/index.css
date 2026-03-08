@@ -17,6 +17,38 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
+/* ── Dark Mode ─────────────────────────────────────── */
+html.dark {
+  color-scheme: dark;
+
+  /* Re-map color tokens — Tailwind v4 uses var() so overriding here cascades everywhere */
+  --color-cream: #0e1c14;
+  --color-mint: #163224;
+  --color-charcoal: #e8f0eb;
+  --color-taupe: #2a3d30;
+  --color-ink: rgba(232, 240, 235, 0.12);
+  --color-forest: #4ade80;
+  --color-terracotta: #f97066;
+  --color-gold: #fbbf24;
+}
+
+html.dark body {
+  background-color: #0e1c14;
+  color: #e8f0eb;
+}
+
+/* White surfaces → dark card surface */
+html.dark .bg-white {
+  background-color: #152a1e !important;
+}
+
+/* Sidebar specifically */
+html.dark aside {
+  background-color: #0a1510 !important;
+  border-color: rgba(232, 240, 235, 0.08) !important;
+}
+
+
 @layer base {
   body {
     @apply bg-cream text-charcoal font-sans antialiased selection:bg-forest selection:text-cream;

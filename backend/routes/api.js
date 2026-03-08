@@ -284,20 +284,23 @@ router.post('/onboard', async (req, res) => {
     if (!profile) {
       return res.status(400).json({ error: 'profile is required' });
     }
-    const result = await generateCriticalPath(profile);
-    res.json({ tasks: result.tasks });
-  } catch (err) {
-    console.error('Onboard API error:', err.message);
-    res.json({
+
+    // For a snappy demo experience, bypass the 5-10s Gemini generation 
+    // and use instant mock data, simulating a fast 1-second process.
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    return res.json({
       tasks: [
         { id: 'sin', title: 'Apply for your SIN', description: 'Your Social Insurance Number is required to work legally in Canada.', daysFromArrival: 1, urgency: 'critical', estimatedTime: '2-3 hours' },
         { id: 'bank', title: 'Open a Bank Account', description: 'Set up your Canadian financial foundation.', daysFromArrival: 2, urgency: 'critical', estimatedTime: '2 hours' },
         { id: 'sim', title: 'Get a SIM Card', description: 'A local phone number is vital for job applications.', daysFromArrival: 1, urgency: 'high', estimatedTime: '30 mins' },
         { id: 'health', title: 'Register for Provincial Healthcare', description: 'Register for your provincial health insurance card.', daysFromArrival: 7, urgency: 'high', estimatedTime: '1 hour' },
         { id: 'housing', title: 'Secure Long-term Housing', description: 'Move from temporary to permanent accommodation.', daysFromArrival: 14, urgency: 'medium', estimatedTime: '2-4 weeks' },
-      ],
-      fallback: true
+      ]
     });
+  } catch (err) {
+    console.error('Onboard API error:', err.message);
+    res.status(500).json({ error: 'Failed to generate profile' });
   }
 });
 

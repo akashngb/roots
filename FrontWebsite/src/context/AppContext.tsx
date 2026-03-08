@@ -198,6 +198,27 @@ const AppContext = createContext<AppContextType>({
     t: translations.en,
 });
 
+// Maps our language codes to Google Translate's cookie format
+const GT_LANG_MAP: Record<Language, string | null> = {
+    en: null, // null = restore English
+    fr: '/en/fr', zh: '/en/zh-CN', pa: '/en/pa',
+    es: '/en/es', ar: '/en/ar', tl: '/en/tl', it: '/en/it',
+    de: '/en/de', pt: '/en/pt', hi: '/en/hi',
+};
+
+const setGTCookie = (value: string | null) => {
+    const expiry = value ? '' : '; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+    const val = value ?? '';
+    document.cookie = `googtrans=${val}${expiry}; path=/`;
+    document.cookie = `googtrans=${val}${expiry}; path=/; domain=${window.location.hostname}`;
+};
+
+const triggerGoogleTranslate = (lang: Language) => {
+    const gtValue = GT_LANG_MAP[lang];
+    setGTCookie(gtValue);
+    window.location.reload();
+};
+
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [language, setLanguageState] = useState<Language>(() => {
         return (localStorage.getItem('app-language') as Language) || 'en';
@@ -209,6 +230,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
         localStorage.setItem('app-language', lang);
+        triggerGoogleTranslate(lang);
     };
 
     const setDarkMode = (dark: boolean) => {

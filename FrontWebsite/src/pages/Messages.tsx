@@ -10,9 +10,9 @@ import {
   Smile,
   CheckCheck,
   Search,
-  Sparkles,
   ArrowLeft
 } from 'lucide-react';
+import { Logo } from '../components/Logo';
 
 interface Message {
   id: string;
@@ -88,8 +88,8 @@ export const Messages = () => {
             <div key={i} className={`p-6 border-b border-taupe/30 cursor-pointer transition-all duration-300 ${chat.active ? 'bg-cream/50 border-l-4 border-l-forest' : 'hover:bg-cream/20'}`}>
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${chat.ai ? 'bg-forest' : 'bg-taupe'}`}>
-                    {chat.ai ? <Sparkles size={18} /> : chat.name[0]}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white overflow-hidden ${chat.ai ? 'bg-forest' : 'bg-taupe'}`}>
+                    {chat.ai ? <Logo className="w-10 h-10" /> : chat.name[0]}
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-charcoal">{chat.name}</h4>
@@ -109,8 +109,8 @@ export const Messages = () => {
         <div className="bg-white/80 backdrop-blur-md border-b border-taupe p-6 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="w-14 h-14 bg-forest rounded-2xl flex items-center justify-center text-white shadow-lg shadow-forest/20">
-                <Sparkles size={28} />
+              <div className="w-14 h-14 bg-forest rounded-2xl flex items-center justify-center text-white shadow-lg shadow-forest/20 overflow-hidden">
+                <Logo className="w-14 h-14" />
               </div>
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-mint border-2 border-white rounded-full" />
             </div>
@@ -148,8 +148,8 @@ export const Messages = () => {
             >
               <div className={`max-w-[80%] md:max-w-[60%] group relative ${msg.sender === 'user' ? 'order-1' : 'order-2'}`}>
                 <div className={`p-6 md:p-8 rounded-[2rem] shadow-sm relative transition-all duration-500 ${msg.sender === 'user'
-                    ? 'bg-forest text-white rounded-tr-none shadow-xl shadow-forest/10'
-                    : 'bg-white border border-taupe text-charcoal rounded-tl-none'
+                  ? 'bg-forest text-white rounded-tr-none shadow-xl shadow-forest/10'
+                  : 'bg-white border border-taupe text-charcoal rounded-tl-none'
                   }`}>
                   <p className="text-base leading-relaxed font-light">{msg.text}</p>
                   <div className={`flex items-center justify-end gap-2 mt-4 text-[10px] font-bold uppercase tracking-widest ${msg.sender === 'user' ? 'text-white/40' : 'text-charcoal/20'}`}>
