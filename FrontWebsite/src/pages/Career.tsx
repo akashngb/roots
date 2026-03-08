@@ -115,7 +115,10 @@ export const Career = () => {
             <p className="text-xl opacity-70 leading-relaxed mb-12 font-light">
               Don't start from zero. Let your international history speak for you in the Canadian market.
             </p>
-            <button className="w-full py-6 bg-white text-terracotta rounded text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-cream transition-all shadow-2xl shadow-black/10">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-ai-chat', { detail: { message: `I would like to verify my international ${selectedProfession.toLowerCase()} experience for the Canadian market. Where do I start?` } }))}
+              className="w-full py-6 bg-white text-terracotta rounded text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-cream transition-all shadow-2xl shadow-black/10"
+            >
               Verify Experience
             </button>
           </motion.div>
@@ -170,7 +173,10 @@ export const Career = () => {
                     </div>
                     <p className="text-xl text-charcoal/50 leading-relaxed font-light mb-10">{step.desc}</p>
                     {step.status === 'ready' && (
-                      <button className="text-[10px] font-bold uppercase tracking-[0.4em] text-forest flex items-center gap-4 group/btn hover:gap-6 transition-all">
+                      <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('open-ai-chat', { detail: { message: `I'm ready to execute the module: ${step.title}` } }))}
+                        className="text-[10px] font-bold uppercase tracking-[0.4em] text-forest flex items-center gap-4 group/btn hover:gap-6 transition-all"
+                      >
                         Execute Module
                         <ArrowRight size={18} className="transition-transform" />
                       </button>
@@ -223,10 +229,16 @@ export const Career = () => {
                 Specialized programs in Toronto for international <span className="text-forest font-bold">{selectedProfession.toLowerCase()}s</span>.
               </p>
               <div className="space-y-4">
-                <button className="w-full flex items-center justify-between p-8 bg-white rounded text-[10px] font-bold uppercase tracking-[0.3em] text-forest hover:bg-forest hover:text-white transition-all duration-500 shadow-2xl shadow-black/5 border border-ink">
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-ai-chat', { detail: { message: `Tell me more about the U of T Bridge program for ${selectedProfession.toLowerCase()}s.` } }))}
+                  className="w-full flex items-center justify-between p-8 bg-white rounded text-[10px] font-bold uppercase tracking-[0.3em] text-forest hover:bg-forest hover:text-white transition-all duration-500 shadow-2xl shadow-black/5 border border-ink"
+                >
                   U of T Bridge <ExternalLink size={16} />
                 </button>
-                <button className="w-full flex items-center justify-between p-8 bg-white rounded text-[10px] font-bold uppercase tracking-[0.3em] text-forest hover:bg-forest hover:text-white transition-all duration-500 shadow-2xl shadow-black/5 border border-ink">
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-ai-chat', { detail: { message: `Tell me more about the ACCES Tech program for ${selectedProfession.toLowerCase()}s.` } }))}
+                  className="w-full flex items-center justify-between p-8 bg-white rounded text-[10px] font-bold uppercase tracking-[0.3em] text-forest hover:bg-forest hover:text-white transition-all duration-500 shadow-2xl shadow-black/5 border border-ink"
+                >
                   ACCES Tech <ExternalLink size={16} />
                 </button>
               </div>
